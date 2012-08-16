@@ -198,7 +198,8 @@ function! s:CacheErrors()
 
         "sub - for _ in filetypes otherwise we cant name syntax checker
         "functions legally for filetypes like "gentoo-metadata"
-        let fts = substitute(&ft, '-', '_', 'g')
+        "let fts = substitute(&ft, '-', '_', 'g')
+        let fts = expand("%")
         for ft in split(fts, '\.')
             if s:Checkable(ft)
                 let errors = SyntaxCheckers_{ft}_GetLocList()
@@ -566,7 +567,13 @@ function! SyntasticMake(options)
     if s:OSSupportsShellpipeHack()
         "this is a hack to stop the screen needing to be ':redraw'n when
         "when :lmake is run. Otherwise the screen flickers annoyingly
-        let &shellpipe='&>'
+
+        if exists("loaded_cf_syntax_checker")
+            let &shellpipe='2>'
+        else
+            let &shellpipe='&>'
+        endif
+
         let &shell = '/bin/bash'
     endif
 
